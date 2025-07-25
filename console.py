@@ -32,6 +32,8 @@ class HBNBCommand(cmd.Cmd):
     def do_quit(self, arg):
         """Quit command to exit the program"""
         return True
+    
+
 
     def _key_value_parser(self, args):
         """creates a dictionary from a list of strings"""
@@ -41,33 +43,50 @@ class HBNBCommand(cmd.Cmd):
                 kvp = arg.split('=', 1)
                 key = kvp[0]
                 value = kvp[1]
-                if value[0] == value[-1] == '"':
+                if value and value[0] == value[-1] == '"':
                     value = shlex.split(value)[0].replace('_', ' ')
                 else:
                     try:
                         value = int(value)
-                    except:
+                    except ValueError:
                         try:
                             value = float(value)
-                        except:
-                            continue
+                        except ValueError:
+                            pass  # keep as string if not int/float
                 new_dict[key] = value
         return new_dict
-
+        
+        
+        
     def do_create(self, arg):
-        """Creates a new instance of a class"""
-        args = arg.split()
-        if len(args) == 0:
+        """Creates a new instance of a class with optional attributes"""
+        args = shlex.split(arg)
+        if not args:
             print("** class name missing **")
-            return False
-        if args[0] in classes:
-            new_dict = self._key_value_parser(args[1:])
-            instance = classes[args[0]](**new_dict)
-        else:
+            return
+
+        class_name = args[0]
+        if class_name not in classes:
             print("** class doesn't exist **")
-            return False
-        print(instance.id)
+            return
+
+        # Use the existing _key_value_parser for robust parsing
+        kwargs = self._key_value_parser(args[1:])
+
+        # Check required fields for Place
+        if class_name == "Place":
+            required_fields = ["city_id", "user_id", "name"]
+            for field in required_fields:
+                if field not in kwargs or not kwargs[field]:
+                    print(f"** missing required attribute: {field} **")
+                    return
+
+        # Now create instance
+        instance = classes[class_name](**kwargs)
         instance.save()
+        print(instance.id)
+
+
 
     def do_show(self, arg):
         """Prints an instance as a string based on the class and id"""
