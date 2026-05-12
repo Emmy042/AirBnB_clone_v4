@@ -32,8 +32,6 @@ class HBNBCommand(cmd.Cmd):
     def do_quit(self, arg):
         """Quit command to exit the program"""
         return True
-    
-
 
     def _key_value_parser(self, args):
         """creates a dictionary from a list of strings"""
@@ -55,9 +53,7 @@ class HBNBCommand(cmd.Cmd):
                             pass  # keep as string if not int/float
                 new_dict[key] = value
         return new_dict
-        
-        
-        
+
     def do_create(self, arg):
         """Creates a new instance of a class with optional attributes"""
         args = shlex.split(arg)
@@ -85,8 +81,6 @@ class HBNBCommand(cmd.Cmd):
         instance = classes[class_name](**kwargs)
         instance.save()
         print(instance.id)
-
-
 
     def do_show(self, arg):
         """Prints an instance as a string based on the class and id"""
